@@ -241,8 +241,8 @@ class S3StorageProvider(StorageProvider):
             if e.response['Error']['Code'] == '404':
                 return False
 
-            # pragma: no cover
-            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
+            # pylint: disable=raise-missing-from
+            raise falcon.HTTPInternalServerError(  # pragma: no cover
                 # code=code(),
                 description='File download failed.',
                 title='Internal Server Error',
