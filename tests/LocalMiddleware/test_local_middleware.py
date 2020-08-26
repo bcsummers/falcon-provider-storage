@@ -7,11 +7,11 @@ import os
 from typing import Tuple
 from uuid import uuid4
 
-# first-party
-from falcon_provider_storage.utils import LocalStorageProvider
-
 # third-party
 from falcon.testing import Result
+
+# first-party
+from falcon_provider_storage.utils import LocalStorageProvider
 
 
 def read_file() -> object:

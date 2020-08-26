@@ -57,7 +57,7 @@ class LocalStorageProvider(StorageProvider):
         super().__init__(bucket)
 
         if not os.access(self.bucket, os.W_OK):  # pragma: no cover
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='App does not have write access to storage bucket.',
                 title='Internal Server Error',
@@ -98,7 +98,7 @@ class LocalStorageProvider(StorageProvider):
                 return fh.read()
         # except IOError as err:
         except IOError:
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description=f'File ({path}) could not be accessed.',
                 title='Internal Server Error',
@@ -124,7 +124,7 @@ class LocalStorageProvider(StorageProvider):
                 fh.write(contents.read())
         # except IOError as err:
         except IOError:
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File could not be written.',
                 title='Internal Server Error',
@@ -215,7 +215,7 @@ class S3StorageProvider(StorageProvider):
         try:
             file_obj: object = self.client.get_object(Bucket=self.bucket, Key=path)
         except Exception:
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File download failed.',
                 title='Internal Server Error',
@@ -242,13 +242,13 @@ class S3StorageProvider(StorageProvider):
                 return False
 
             # pragma: no cover
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File download failed.',
                 title='Internal Server Error',
             )
         except TypeError:  # pragma: no cover
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File download failed.',
                 title='Internal Server Error',
@@ -273,7 +273,7 @@ class S3StorageProvider(StorageProvider):
                 contents, self.bucket, path, ExtraArgs={'ContentType': content_type}
             )
         except (ClientError, TypeError) as err:
-            raise falcon.HTTPInternalServerError(
+            raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description=f'File upload failed ({err}).',
                 title='Internal Server Error',

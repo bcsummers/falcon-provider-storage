@@ -38,7 +38,7 @@ class S3StorageResource1:
             env.setdefault('QUERY_STRING', '')
             app_data = cgi.FieldStorage(fp=req.stream, environ=env)
         except TypeError:
-            raise falcon.HTTPBadRequest(
+            raise falcon.HTTPBadRequest(  # pylint: disable=raise-missing-from
                 # code=self.code(),
                 description='File upload must be form-data',
                 title='Bad Request',
@@ -47,7 +47,7 @@ class S3StorageResource1:
         try:
             app_file = app_data['file']
         except KeyError:
-            raise falcon.HTTPBadRequest(
+            raise falcon.HTTPBadRequest(  # pylint: disable=raise-missing-from
                 # code=self.code(),
                 description='No App uploaded',
                 title='Bad Request',

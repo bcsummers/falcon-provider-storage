@@ -80,9 +80,10 @@ def test_s3_hook_file_delete(
         assert True
 
 
+# pylint: disable=unused-argument
 def test_s3_hook_file_delete_404(
     client_hook_s3_storage_1: object, s3_client: object, s3_resource: object, s3_bucket: str
-) -> None:  # pylint: disable=unused-argument
+) -> None:
     """Testing DELETE resource
 
     Args:
