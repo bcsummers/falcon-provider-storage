@@ -2,7 +2,6 @@
 """Storage Provider Module"""
 # standard library
 import os
-from typing import Optional
 
 # third-party
 import falcon
@@ -30,7 +29,7 @@ class StorageProvider:
         """Delete file from storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
-    def get_file(self, path: str):  # pragma: no cover
+    def get_file(self, path: str, **kwargs):  # pragma: no cover
         """Return file from storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
@@ -38,9 +37,7 @@ class StorageProvider:
         """Return True if file exist, else False."""
         raise NotImplementedError('This method must be implemented in child class.')
 
-    def save_file(
-        self, contents: bytes, path: str, content_type: Optional[str] = None
-    ):  # pragma: no cover
+    def save_file(self, contents: bytes, path: str, **kwargs):  # pragma: no cover
         """Write file to storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
@@ -80,11 +77,12 @@ class LocalStorageProvider(StorageProvider):
         except PermissionError:  # pragma: no cover
             return False
 
-    def get_file(self, path: str) -> bytes:
+    def get_file(self, path: str, **kwargs) -> bytes:
         """Return file from storage.
 
         Args:
             path: The path of the file to return.
+            mode (str | kwargs): The read mode for the file.
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file download.
@@ -94,9 +92,8 @@ class LocalStorageProvider(StorageProvider):
         """
         fully_qualified_path = os.path.join(self.bucket, path)
         try:
-            with open(fully_qualified_path, 'r') as fh:
+            with open(fully_qualified_path, kwargs.get('mode', 'rb')) as fh:
                 return fh.read()
-        # except IOError as err:
         except IOError:
             raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
@@ -116,14 +113,27 @@ class LocalStorageProvider(StorageProvider):
         fully_qualified_path = os.path.join(self.bucket, path)
         return os.path.isfile(fully_qualified_path)
 
-    def save_file(self, contents, path, content_type=None):
-        """Write file to storage."""
+    def save_file(self, contents, path, **kwargs):
+        """Write file to storage.
+
+        Args:
+            contents: The contents of the file.
+            path: The path to write the file.
+            mode (str | kwargs): The write mode, defaults to 'wb'.
+
+        Raises:
+            falcon.HTTPInternalServerError: Raised for any exception during the file check.
+
+        Returns:
+            str: The final path to where the file was written.
+        """
         fully_qualified_path = os.path.join(self.bucket, path)
+        # ensure the directory exists
         try:
-            with open(fully_qualified_path, 'wb') as fh:
+            os.makedirs(os.path.dirname(fully_qualified_path), exist_ok=True)
+            with open(fully_qualified_path, kwargs.get('mode', 'wb')) as fh:
                 fh.write(contents.read())
-        # except IOError as err:
-        except IOError:
+        except IOError:  # pragma: no cover
             raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File could not be written.',
@@ -200,7 +210,7 @@ class S3StorageProvider(StorageProvider):
         else:
             return False
 
-    def get_file(self, path: str) -> object:
+    def get_file(self, path: str, **kwargs) -> object:
         """Return file from storage.
 
         Args:
@@ -254,13 +264,13 @@ class S3StorageProvider(StorageProvider):
                 title='Internal Server Error',
             )
 
-    def save_file(self, contents: bytes, path: str, content_type: Optional[str] = None):
+    def save_file(self, contents: bytes, path: str, **kwargs):
         """Write file to storage.
 
         Args:
             contents: The contents of the file.
             path: The path to write the file.
-            content_type: The file content-type.
+            content_type (str | kwargs): The file content-type.
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file check.
@@ -270,7 +280,7 @@ class S3StorageProvider(StorageProvider):
         """
         try:
             self.client.upload_fileobj(
-                contents, self.bucket, path, ExtraArgs={'ContentType': content_type}
+                contents, self.bucket, path, ExtraArgs={'ContentType': kwargs.get('content_type')}
             )
         except (ClientError, TypeError) as err:
             raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from

@@ -67,7 +67,7 @@ For more information on falcon hooks see https://falcon.readthedocs.io/en/stable
             filename = req.get_param('filename')
             if self.is_file(filename):  # code coverage testing of is_file
                 pass
-            resp.body = self.get_file(filename)
+            resp.body = self.get_file(filename)  # optionally pass read mode (e.g., mode='rb')
 
         def on_post(self, req, resp):
             """Support POST method."""
@@ -90,9 +90,9 @@ For more information on falcon hooks see https://falcon.readthedocs.io/en/stable
                     title='Bad Request',
                 )
 
-            resp.body = self.save_file(
-                app_file.file, app_file.filename, req.content_type
-            )
+            # if directory doesn't exist it will be created automatically
+            # optionally pass write mode (e.g., mode='wb')
+            resp.body = self.save_file(app_file.file, app_file.filename)
 
 
     app = falcon.API()
@@ -149,9 +149,7 @@ When using StorageMiddleware all responder methods will have access to the four 
                     title='Bad Request',
                 )
 
-            storage_path = self.save_file(
-                app_file.file, app_file.filename, req.content_type
-            )
+            storage_path = self.save_file(app_file.file, app_file.filename)
             resp.body = storage_path
 
 

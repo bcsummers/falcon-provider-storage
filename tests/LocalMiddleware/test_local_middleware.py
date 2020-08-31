@@ -152,30 +152,31 @@ def test_local_file_upload(client_local_storage_1, storage_directory) -> None:
         assert False, 'Uploaded file does not exist in storage'
 
 
-def test_local_file_upload_fail(client_local_storage_1) -> None:
-    """Testing POSt resource
+# def test_local_file_upload_fail(client_local_storage_1) -> None:
+#     """Testing POSt resource
+#
+#     Args:
+#         client_local_storage_1 (fixture): The test client.
+#         storage_directory (fixture): The storage directory.
+#     """
+#     file_key = f'{uuid4()}'
+#
+#     # fields
+#     fields = {'file': {'filename': f'sub1/{file_key}.txt', 'content': file_key}}
+#     fields.update({'key': file_key})
+#
+#     # multi-part data
+#     data, headers = create_multipart_formdata(fields)
+#
+#     response: Result = client_local_storage_1.simulate_post(
+#         '/middleware', body=data, headers=headers
+#     )
+#     assert response.status_code == 500
+#     response_data = json.loads(response.text)
+#     assert response_data.get('title') == 'Internal Server Error'
 
-    Args:
-        client_local_storage_1 (fixture): The test client.
-        storage_directory (fixture): The storage directory.
-    """
-    file_key = f'{uuid4()}'
 
-    # fields
-    fields = {'file': {'filename': f'sub1/{file_key}.txt', 'content': file_key}}
-    fields.update({'key': file_key})
-
-    # multi-part data
-    data, headers = create_multipart_formdata(fields)
-
-    response: Result = client_local_storage_1.simulate_post(
-        '/middleware', body=data, headers=headers
-    )
-    assert response.status_code == 500
-    response_data = json.loads(response.text)
-    assert response_data.get('title') == 'Internal Server Error'
-
-
+# directories are now automatically created
 def test_bad_directory() -> None:
     """Testing bad bucket path"""
     passed = True

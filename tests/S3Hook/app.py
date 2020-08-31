@@ -59,7 +59,7 @@ class S3StorageResource1:
                 title='Bad Request',
             )
 
-        resp.body = self.save_file(app_file.file, app_file.filename, req.content_type)
+        resp.body = self.save_file(app_file.file, app_file.filename, content_type=req.content_type)
 
 
 app_hook_s3_storage_1 = falcon.API()

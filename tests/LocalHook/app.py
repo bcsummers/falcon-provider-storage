@@ -57,7 +57,7 @@ class LocalStorageResource1:
                 title='Bad Request',
             )
 
-        resp.body = self.save_file(app_file.file, app_file.filename, req.content_type)
+        resp.body = self.save_file(app_file.file, app_file.filename)
 
 
 app_hook_local_storage_1 = falcon.API()

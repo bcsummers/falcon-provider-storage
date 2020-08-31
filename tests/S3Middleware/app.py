@@ -53,7 +53,9 @@ class S3StorageResource1:
                 title='Bad Request',
             )
 
-        storage_path = self.save_file(app_file.file, app_file.filename, req.content_type)
+        storage_path = self.save_file(
+            app_file.file, app_file.filename, content_type=req.content_type
+        )
         resp.body = storage_path
 
 
