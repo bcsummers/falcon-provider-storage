@@ -119,7 +119,7 @@ def test_local_does_not_exists(client_hook_local_storage_1) -> None:
     response: Result = client_hook_local_storage_1.simulate_get('/middleware', params=params)
     assert response.status_code == 500
     response_data = json.loads(response.text)
-    assert response_data.get('title') == '500 Internal Server Error'
+    assert response_data.get('title') == 'Internal Server Error'
 
 
 def test_local_file_upload(client_hook_local_storage_1, storage_directory) -> None:

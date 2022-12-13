@@ -14,6 +14,7 @@ from .S3Middleware.app import app_s3_storage_1, app_s3_storage_2
 
 # the log directory for all test cases
 _storage_directory = 'storage'
+os.makedirs(_storage_directory, exist_ok=True)
 
 
 @pytest.fixture
