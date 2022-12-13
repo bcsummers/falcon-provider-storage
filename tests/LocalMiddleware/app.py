@@ -1,4 +1,6 @@
 """Falcon app used for testing."""
+# standard library
+import os
 
 # third-party
 import falcon
@@ -47,6 +49,10 @@ class LocalStorageResource1:
         resp.text = self.save_file(data, filename)
 
 
-local_provider = LocalStorageProvider(bucket='storage')
+# create
+_storage_directory = 'storage'
+os.makedirs(_storage_directory, exist_ok=True)
+
+local_provider = LocalStorageProvider(bucket=_storage_directory)
 app_local_storage_1 = falcon.App(middleware=[StorageMiddleware(provider=local_provider)])
 app_local_storage_1.add_route('/middleware', LocalStorageResource1())
