@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """Test hooks feature of falcon_provider_memcache module."""
 # standard library
 import binascii
 import json
 import os
-from typing import Tuple
 from uuid import uuid4
 
 # third-party
@@ -13,10 +11,10 @@ from falcon.testing import Result
 
 def read_file() -> object:
     """Return file object for file upload."""
-    return open('storage/test', 'r')
+    return open('storage/test', encoding='utf-8')
 
 
-def create_multipart_formdata(fields: list) -> Tuple[str, dict]:
+def create_multipart_formdata(fields: list) -> tuple[str, dict]:
     """Create form data.
 
     Args:
@@ -25,7 +23,7 @@ def create_multipart_formdata(fields: list) -> Tuple[str, dict]:
     Returns:
         tuple: The request body and headers
     """
-    random: str = binascii.hexlify(os.urandom(16)).decode('ascii')
+    random = binascii.hexlify(os.urandom(16)).decode('ascii')
     boundary = f'----WebKitFormBoundary{random}'
 
     body = []
@@ -65,7 +63,7 @@ def test_local_delete(client_hook_local_storage_1, storage_directory) -> None:
 
     # create file in storage to read
     filename: str = os.path.join(storage_directory, f'{key}.txt')
-    with open(filename, 'w') as fh:
+    with open(filename, 'w', encoding='utf-8') as fh:
         fh.write('delete me')
 
     params = {'filename': filename}
@@ -102,7 +100,7 @@ def test_local_file_exists(client_hook_local_storage_1, storage_directory) -> No
 
     # create file in storage to read
     filename = os.path.join(storage_directory, f'{key}.txt')
-    with open(filename, 'w') as fh:
+    with open(filename, 'w', encoding='utf-8') as fh:
         fh.write(key)
 
     params = {'filename': f'{key}.txt'}
@@ -121,7 +119,7 @@ def test_local_does_not_exists(client_hook_local_storage_1) -> None:
     response: Result = client_hook_local_storage_1.simulate_get('/middleware', params=params)
     assert response.status_code == 500
     response_data = json.loads(response.text)
-    assert response_data.get('title') == 'Internal Server Error'
+    assert response_data.get('title') == '500 Internal Server Error'
 
 
 def test_local_file_upload(client_hook_local_storage_1, storage_directory) -> None:

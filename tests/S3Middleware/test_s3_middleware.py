@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Test hooks feature of falcon_provider_memcache module."""
 # standard library
 import binascii
 import io
 import json
 import os
-from typing import Tuple
 from uuid import uuid4
 
 # third-party
@@ -13,7 +11,7 @@ import botocore
 from falcon.testing import Result
 
 
-def create_multipart_formdata(fields: list) -> Tuple[str, dict]:
+def create_multipart_formdata(fields: list) -> tuple[str, dict]:
     """Create form data.
 
     Args:

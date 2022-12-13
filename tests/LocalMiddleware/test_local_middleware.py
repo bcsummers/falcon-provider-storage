@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """Test hooks feature of falcon_provider_memcache module."""
 # standard library
 import binascii
 import json
 import os
-from typing import Tuple
 from uuid import uuid4
 
 # third-party
@@ -16,10 +14,10 @@ from falcon_provider_storage.utils import LocalStorageProvider
 
 def read_file() -> object:
     """Return file object for file upload."""
-    return open('storage/test', 'r')
+    return open('storage/test', encoding='utf-8')
 
 
-def create_multipart_formdata(fields) -> Tuple[str, dict]:
+def create_multipart_formdata(fields) -> tuple[str, dict]:
     """Create form data.
 
     Args:
@@ -68,7 +66,7 @@ def test_local_delete(client_local_storage_1, storage_directory) -> None:
 
     # create file in storage to read
     filename: str = os.path.join(storage_directory, f'{key}.txt')
-    with open(filename, 'w') as fh:
+    with open(filename, 'w', encoding='utf-8') as fh:
         fh.write('delete me')
 
     params = {'filename': filename}
@@ -105,7 +103,7 @@ def test_local_file_exists(client_local_storage_1, storage_directory) -> None:
 
     # create file in storage to read
     filename: str = os.path.join(storage_directory, f'{key}.txt')
-    with open(filename, 'w') as fh:
+    with open(filename, 'w', encoding='utf-8') as fh:
         fh.write(key)
 
     params = {'filename': f'{key}.txt'}
@@ -182,7 +180,7 @@ def test_bad_directory() -> None:
     passed = True
     try:
         LocalStorageProvider(bucket='bad-storage')
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         passed = False
 
     if passed:

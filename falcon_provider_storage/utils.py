@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Storage Provider Module"""
 # standard library
 import os
@@ -77,6 +76,7 @@ class LocalStorageProvider(StorageProvider):
         except PermissionError:  # pragma: no cover
             return False
 
+    # pylint: disable=unspecified-encoding
     def get_file(self, path: str, **kwargs) -> bytes:
         """Return file from storage.
 
@@ -94,7 +94,7 @@ class LocalStorageProvider(StorageProvider):
         try:
             with open(fully_qualified_path, kwargs.get('mode', 'rb')) as fh:
                 return fh.read()
-        except IOError:
+        except OSError:
             raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description=f'File ({path}) could not be accessed.',
@@ -113,6 +113,7 @@ class LocalStorageProvider(StorageProvider):
         fully_qualified_path = os.path.join(self.bucket, path)
         return os.path.isfile(fully_qualified_path)
 
+    # pylint: disable=unspecified-encoding
     def save_file(self, contents, path, **kwargs):
         """Write file to storage.
 
@@ -133,7 +134,7 @@ class LocalStorageProvider(StorageProvider):
             os.makedirs(os.path.dirname(fully_qualified_path), exist_ok=True)
             with open(fully_qualified_path, kwargs.get('mode', 'wb')) as fh:
                 fh.write(contents.read())
-        except IOError:  # pragma: no cover
+        except OSError:  # pragma: no cover
             raise falcon.HTTPInternalServerError(  # pylint: disable=raise-missing-from
                 # code=code(),
                 description='File could not be written.',

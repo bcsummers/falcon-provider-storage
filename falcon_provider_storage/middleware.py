@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Falcon storage provider middleware module."""
 # third-party
 import falcon

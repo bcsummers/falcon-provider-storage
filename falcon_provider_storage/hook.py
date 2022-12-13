@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Falcon Storage hook module."""
 # third-party
 import falcon
