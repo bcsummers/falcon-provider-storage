@@ -140,7 +140,7 @@ def test_local_file_upload(client_hook_local_storage_1, storage_directory) -> No
 
     response = client_hook_local_storage_1.simulate_post('/middleware', body=data, headers=headers)
     assert response.status_code == 200
-    assert response.text == f'{storage_directory}/{file_key}.txt'
+    assert response.text == f'{storage_directory}{os.path.sep}{file_key}.txt'
     if not os.path.isfile(response.text):
         assert False, 'Uploaded file does not exist in storage'
 
