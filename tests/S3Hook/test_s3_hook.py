@@ -60,6 +60,7 @@ def test_s3_hook_file_delete(
         s3_resource (fixture): A S3 resource object.
         s3_bucket (fixture): The s3 bucket name.
     """
+    s3_bucket = s3_bucket or 'falcon-provider-storage'
     key = f'{uuid4()}'
     contents = io.BytesIO(key.encode())
 
