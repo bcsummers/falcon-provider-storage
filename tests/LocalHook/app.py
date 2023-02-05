@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 """Falcon app used for testing."""
-# standard library
-import cgi
-
 # third-party
 import falcon
 
@@ -32,33 +28,28 @@ class LocalStorageResource1:
         filename: str = req.get_param('filename')
         if self.is_file(filename):  # code coverage testing of is_file
             pass
-        resp.body = self.get_file(filename)
+        resp.text = self.get_file(filename)
 
     @falcon.before(local_storage, STORAGE_DIRECTORY)
     def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
         """Support POST method."""
         try:
-            env: dict = req.env
-            env.setdefault('QUERY_STRING', '')
-            app_data: dict = cgi.FieldStorage(fp=req.stream, environ=env)
-        except TypeError:
-            raise falcon.HTTPBadRequest(  # pylint: disable=raise-missing-from
+            form = req.get_media()
+            # expect a single
+            for part in form:
+                if part.name == 'file':
+                    data = part.stream
+                    filename = part.filename
+                    break
+        except TypeError as ex:
+            raise falcon.HTTPBadRequest(
                 # code=self.code(),
                 description='File upload must be form-data',
                 title='Bad Request',
-            )
+            ) from ex
 
-        try:
-            app_file = app_data['file']
-        except KeyError:
-            raise falcon.HTTPBadRequest(  # pylint: disable=raise-missing-from
-                # code=self.code(),
-                description='No App uploaded',
-                title='Bad Request',
-            )
-
-        resp.body = self.save_file(app_file.file, app_file.filename)
+        resp.text = self.save_file(data, filename)
 
 
-app_hook_local_storage_1 = falcon.API()
+app_hook_local_storage_1 = falcon.App()
 app_hook_local_storage_1.add_route('/middleware', LocalStorageResource1())

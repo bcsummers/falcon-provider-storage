@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test hooks feature of falcon_provider_memcache module."""
 # standard library
 import binascii
