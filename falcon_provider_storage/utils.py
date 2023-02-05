@@ -1,6 +1,8 @@
 """Storage Provider Module"""
 # standard library
 import os
+from abc import ABC, abstractmethod
+from typing import BinaryIO, TextIO
 
 # third-party
 import falcon
@@ -13,7 +15,7 @@ except ImportError:  # pragma: no cover
     pass
 
 
-class StorageProvider:
+class StorageProviderABC(ABC):
     """Base Storage Provider Module
 
     Args:
@@ -24,24 +26,28 @@ class StorageProvider:
         """Initialize class properties."""
         self.bucket = bucket
 
+    @abstractmethod
     def delete_file(self, path: str):  # pragma: no cover
         """Delete file from storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
+    @abstractmethod
     def get_file(self, path: str, **kwargs):  # pragma: no cover
         """Return file from storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
+    @abstractmethod
     def is_file(self, path: str):  # pragma: no cover
         """Return True if file exist, else False."""
         raise NotImplementedError('This method must be implemented in child class.')
 
+    @abstractmethod
     def save_file(self, contents: bytes, path: str, **kwargs):  # pragma: no cover
         """Write file to storage."""
         raise NotImplementedError('This method must be implemented in child class.')
 
 
-class LocalStorageProvider(StorageProvider):
+class LocalStorageProvider(StorageProviderABC):
     """Local Storage Provider Module
 
     Args:
@@ -77,7 +83,7 @@ class LocalStorageProvider(StorageProvider):
             return False
 
     # pylint: disable=unspecified-encoding
-    def get_file(self, path: str, **kwargs) -> bytes:
+    def get_file(self, path: str, **kwargs) -> bytes | str:
         """Return file from storage.
 
         Args:
@@ -86,12 +92,10 @@ class LocalStorageProvider(StorageProvider):
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file download.
-
-        Returns:
-            bytes: The file contents.
         """
         fully_qualified_path = os.path.join(self.bucket, path)
         try:
+            # TODO: should this just return BinaryIO | TextIO?
             with open(fully_qualified_path, kwargs.get('mode', 'rb')) as fh:
                 return fh.read()
         except OSError:
@@ -106,27 +110,21 @@ class LocalStorageProvider(StorageProvider):
 
         Args:
             path: The path of the file to return.
-
-        Returns:
-            bool: True if file exists, else False.
         """
         fully_qualified_path = os.path.join(self.bucket, path)
         return os.path.isfile(fully_qualified_path)
 
     # pylint: disable=unspecified-encoding
-    def save_file(self, contents, path, **kwargs):
+    def save_file(self, contents: bytes | str, path, **kwargs) -> str:
         """Write file to storage.
 
         Args:
             contents: The contents of the file.
             path: The path to write the file.
-            mode (str | kwargs): The write mode, defaults to 'wb'.
+            mode (str): The write mode, defaults to 'wb'.
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file check.
-
-        Returns:
-            str: The final path to where the file was written.
         """
         fully_qualified_path = os.path.join(self.bucket, path)
         # ensure the directory exists
@@ -143,7 +141,7 @@ class LocalStorageProvider(StorageProvider):
         return fully_qualified_path
 
 
-class S3StorageProvider(StorageProvider):
+class S3StorageProvider(StorageProviderABC):
     """S3 Storage Provider Module
 
     Args:
@@ -211,7 +209,7 @@ class S3StorageProvider(StorageProvider):
         else:
             return False
 
-    def get_file(self, path: str, **kwargs) -> object:
+    def get_file(self, path: str, **kwargs) -> BinaryIO | TextIO:
         """Return file from storage.
 
         Args:
@@ -219,9 +217,6 @@ class S3StorageProvider(StorageProvider):
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file download.
-
-        Returns:
-            object: A boto file object.
         """
         try:
             file_obj: object = self.client.get_object(Bucket=self.bucket, Key=path)
@@ -241,9 +236,6 @@ class S3StorageProvider(StorageProvider):
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file check.
-
-        Returns:
-            bool: True if file exists, else False.
         """
         try:
             self.resource.Object(self.bucket, path).load()
@@ -265,7 +257,7 @@ class S3StorageProvider(StorageProvider):
                 title='Internal Server Error',
             )
 
-    def save_file(self, contents: bytes, path: str, **kwargs):
+    def save_file(self, contents: bytes, path: str, **kwargs) -> str:
         """Write file to storage.
 
         Args:
@@ -275,9 +267,6 @@ class S3StorageProvider(StorageProvider):
 
         Raises:
             falcon.HTTPInternalServerError: Raised for any exception during the file check.
-
-        Returns:
-            str: The final path to where the file was written.
         """
         try:
             self.client.upload_fileobj(

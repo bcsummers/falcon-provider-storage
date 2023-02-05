@@ -2,7 +2,8 @@
 # third-party
 import falcon
 
-from .utils import StorageProvider
+# first-party
+from falcon_provider_storage.utils import StorageProviderABC
 
 
 class StorageMiddleware:
@@ -13,14 +14,14 @@ class StorageMiddleware:
             S3StorageProvider).
     """
 
-    def __init__(self, provider: object):
+    def __init__(self, provider: StorageProviderABC):
         """Initialize class properties."""
         self.provider = provider
-        if not isinstance(provider, StorageProvider):  # pragma: no cover
+        if not isinstance(provider, StorageProviderABC):  # pragma: no cover
             raise ValueError('Invalid provider provided.')
 
     def process_resource(
-        self, req: falcon.Request, resp: falcon.Response, resource: object, params: dict
+        self, _req: falcon.Request, _resp: falcon.Response, resource, _params: dict
     ):  # pylint: disable=unused-argument
         """Process resource method."""
         resource.delete_file = self.provider.delete_file

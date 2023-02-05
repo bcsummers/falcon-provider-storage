@@ -2,11 +2,12 @@
 # third-party
 import falcon
 
-from .utils import LocalStorageProvider, S3StorageProvider
+# first-party
+from falcon_provider_storage.utils import LocalStorageProvider, S3StorageProvider
 
 
 def local_storage(
-    req: falcon.Request, resp: falcon.Response, resource: object, params: dict, bucket: str
+    req: falcon.Request, resp: falcon.Response, resource, params: dict, bucket: str
 ):  # pylint: disable=unused-argument
     """Provide an instance of REDIS client to method via resource.
 
@@ -37,7 +38,7 @@ def local_storage(
 def s3_storage(
     req: falcon.Request,
     resp: falcon.Response,
-    resource: object,
+    resource,
     params: dict,
     bucket: str,
     aws_access_key_id: str,
